@@ -1,0 +1,11 @@
+   \\/// + ++ + +
+Pentagono(
+PentagonoLinea(1,3)(4,5)-(3)-(255,0,0)
+HOLA(
+  Circulo
+Triangulo (1)
+ Rectangulo (4,5)(1,3)
+Cuadrado(1,1)(1,3)(3,3)(3,1)-(2)-(255,255,255)
+Triangulo (1)
+
+
