@@ -1,5 +1,6 @@
 
 //Biblotecas importadas
+import AnalizadorSintactico.*;
 import java.io.IOException; //Bibloteca Control de excepción para localizar el archivo
 import java.io.UnsupportedEncodingException; //Bibloteca Control de excepción para convertir bytes a string
 import java.nio.file.Files; //Bibloteca verificacion de existencia el archivo
@@ -13,7 +14,7 @@ public class Ejecucion {
      */
 
     // Ruta estatica relativa del programa java
-    static String sRutaEstaticaRelativa = ("C:\\Users\\Jadri\\Documents\\ProyectsVisualStudio\\AnalizadorLexico-1\\Ejemplo.txt");
+    static String sRutaEstaticaRelativa = ("C:\\Users\\Jadri\\Documents\\GitHub\\otra\\AnalizadorSintactico\\AnalizadorLexico\\Ejemplo.txt");
 
     public static void main(String[] args) throws IOException {
 
@@ -21,6 +22,13 @@ public class Ejecucion {
         // analisis
         Analisis cAnalizador = new Analisis(ObtenerCodigoFuente(sRutaEstaticaRelativa));
         cAnalizador.Generar();
+        AnalisisSIN analizador = new AnalisisSIN();
+        boolean resultado = analizador.analizar(ObtenerCodigoFuente(sRutaEstaticaRelativa));
+        if (resultado) {
+            System.out.println("La entrada es válida.");
+        } else {
+            System.out.println("La entrada es inválida.");
+        }
     }
 
     public static String ObtenerCodigoFuente(String sRutaEstatica) throws IOException {

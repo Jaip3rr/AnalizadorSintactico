@@ -4,7 +4,7 @@ public class Resultado {
 
         }
 
-        public void ImprimirTblaTokens(TblaTokens[] aSimbolo) {
+        public void ImprimirTblaTokens(TblaTokens[] aSimbolo, String tipo) {
                 System.out.println();
                 System.out.println(
                                 "---------------------------------------------------------------------------------------------------------------------------------");
@@ -93,10 +93,12 @@ public class Resultado {
                 System.out.println();
                 System.out.println(
                                 "---------------------------------------------------------------------------------------------------------------------------------");
-                System.out.printf("%25s %25s %25s %10s %10s", "Token Simbolo", "Lexema", "Linea", "Inicio", "Final");
+                System.out.printf("%25s %25s %25s %10s %10s", "Simbolo", "Lexema", "Linea", "Inicio", "Final");
                 System.out.println();
                 System.out.println(
                                 "---------------------------------------------------------------------------------------------------------------------------------");
+
+                
 
                 for (int x = 0; x < aSimbolos.length; x++) {
                         var aSimbolo = aSimbolos[x];

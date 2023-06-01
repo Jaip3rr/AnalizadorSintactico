@@ -16,6 +16,7 @@ public class Analisis {
     Resultado oResultado = new Resultado();
     int nPosLectura = 0;
     int nLinea = 0;
+    String tipoGRM = "";
     Set<String> simbolosAgregados = new HashSet<>();
     Set<String> PRAgregados = new HashSet<>();
 
@@ -53,12 +54,14 @@ public class Analisis {
             String tokenDigito = mMatcher.group(6);
             String tokenEspacios = mMatcher.group(7);
 
+            
+
             int nPosInicioLexema = 0;
             nLinea = ObtenerLinea(sCodigoFuente, mMatcher.start());
 
+
             //Palabras Reservadas
             if (tokenPalabrasrReservadas != null) {
-
                 nPosLectura += tokenPalabrasrReservadas.length();
                 nPosInicioLexema = nPosLectura - tokenPalabrasrReservadas.length();
                 AgregarTablaToken("Palabras reservadas:", tokenPalabrasrReservadas, nLinea, nPosInicioLexema,
@@ -70,37 +73,62 @@ public class Analisis {
 
             //OAritmeticas
             if(tokenOAritmeticas != null){
+                tipoGRM = "Guion";
                 nPosLectura += tokenOAritmeticas.length();
                 nPosInicioLexema = nPosLectura - tokenOAritmeticas.length();
                 AgregarTablaToken("Operador/separador", tokenOAritmeticas, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                if(!simbolosAgregados.contains(tokenOAritmeticas)){
+                AgregarTablaSimbolos("Operador/separador: ", tokenOAritmeticas, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                simbolosAgregados.add(tokenOAritmeticas);
+                }
             }
 
             //ParentesisIzquierdo
             if (tokenParentesisIzq != null) {
+                tipoGRM = "Parentesis abierto";
                 nPosLectura += tokenParentesisIzq.length();
                 nPosInicioLexema = nPosLectura - tokenParentesisIzq.length();
                 AgregarTablaToken("Delimitador:", tokenParentesisIzq, nLinea, nPosInicioLexema, nPosLectura);
+                if(!simbolosAgregados.contains(tokenParentesisIzq)){
+                AgregarTablaSimbolos("Delimitador: ", tokenParentesisIzq, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                simbolosAgregados.add(tokenParentesisIzq);
+            }
             }
             
             //ParentesisDerecho
             if(tokenParentesisDer != null){
+                tipoGRM = "Parentesis cerrado";
                 nPosLectura += tokenParentesisDer.length();
                 nPosInicioLexema = nPosLectura - tokenParentesisDer.length();
                 AgregarTablaToken("Delimitador:", tokenParentesisDer, nLinea, nPosInicioLexema, nPosLectura);
+                if(!simbolosAgregados.contains(tokenParentesisDer)){
+                AgregarTablaSimbolos("DER Delimitador: ", tokenParentesisDer, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                simbolosAgregados.add(tokenParentesisDer);
+                }
             }
 
             //Coma
             if(tokenComa != null){
+                tipoGRM = "Coma";
                 nPosLectura += tokenComa.length();
                 nPosInicioLexema = nPosLectura - tokenComa.length();
                 AgregarTablaToken("Delimitador:", tokenComa, nLinea, nPosInicioLexema, nPosLectura);
+                if(!simbolosAgregados.contains(tokenComa)){
+                AgregarTablaSimbolos("Delimitador: ", tokenComa, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                simbolosAgregados.add(tokenComa);
+            }
             }
 
             //Digito
             if(tokenDigito != null){
+                tipoGRM = "Numero";
                 nPosLectura += tokenDigito.length();
                 nPosInicioLexema = nPosLectura - tokenDigito.length();
                 AgregarTablaToken("Digito:", tokenDigito, nLinea, nPosInicioLexema, nPosLectura);
+                if(!simbolosAgregados.contains(tokenDigito)){
+                AgregarTablaSimbolos("Digito: ", tokenDigito, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                simbolosAgregados.add(tokenDigito);
+                }
             }
 
            //Espacios
@@ -188,10 +216,10 @@ public class Analisis {
                     }
                 }
 
-        oResultado.ImprimirTblaTokens(TaToken);
+        // oResultado.ImprimirTblaTokens(TaToken);
         oResultado.ImprimirTblaPlRes(TaReserv);
         oResultado.ImprimirTblaSimb(TaSimbolos);
-        oResultado.ImprimirTblaError(TaErrors);
+        // oResultado.ImprimirTblaError(TaErrors);
 
 
     }
