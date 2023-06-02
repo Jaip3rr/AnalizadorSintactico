@@ -1,6 +1,5 @@
-import java.util.ArrayList;
+
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +41,7 @@ public class Analisis {
         String regexFigura = "(((\\(\\d{1,2},\\d{1,2}\\)){2,4})+-+\\([1-3]\\)+-+\\((25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2})\\))|"
                 + "(((\s)*))";
 
-        String regexCoordenada = "\\(((\\d,[0-9]),(\\d,[0-9])){2,4}\\)";
+        String regexCoordenada = "\\((\\d,[0-9])\\)"; 
 
         String regexGrosor = "\\(([1-3])\\)";
 
@@ -64,15 +63,17 @@ public class Analisis {
 
 
         while (mMatcherCoordenada.find()) {
-            String tokenCoordenada = mMatcherCoordenada.group(1);
-        
+            String tokenCoordenadas = mMatcherCoordenada.group(1);
+
             nLinea = ObtenerLinea(sCodigoFuente, mMatcherCoordenada.start());
-        
-            if (tokenCoordenada != null) {
-                nPosLectura += tokenCoordenada.length();
-                int nPosInicioLexema = nPosLectura - tokenCoordenada.length();
-        
-                AgregarTablaSimbolos("Coordenada:", tokenCoordenada, nLinea, nPosInicioLexema, nPosLectura);
+
+            if(tokenCoordenadas != null){
+                nPosLectura += tokenCoordenadas.length();
+                int nPosInicioLexema = nPosLectura - tokenCoordenadas.length();
+
+
+                AgregarTablaSimbolos("Coordenadas", tokenCoordenadas, nLinea, nPosInicioLexema,
+                nPosLectura);
             }
         }
 
