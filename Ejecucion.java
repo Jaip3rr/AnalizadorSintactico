@@ -13,7 +13,7 @@ public class Ejecucion {
      */
 
     // Ruta estatica relativa del programa java
-    static String sRutaEstaticaRelativa = ("C:\\Users\\yailp\\OneDrive\\Documentos\\GitHub\\AnalizadorSintactico\\Ejemplo.txt");
+    static String sRutaEstaticaRelativa = ("C:\\Users\\Jadri\\Documents\\ProyectsVisualStudio\\Sintatico\\AnalizadorSintactico\\Ejemplo.txt");
 
     public static void main(String[] args) throws IOException {
 
