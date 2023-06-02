@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,41 +25,147 @@ public class Analisis {
     public Analisis(String sCodigoFuente) {
         this.sCodigoFuente = sCodigoFuente;
         this.sCodigoFuenteErrores = sCodigoFuente;
-        // System.out.println(sCodigoFuente);
     }
 
     public void Generar() {
 
         // Establecemos una cadena de coincidencias Esto es una expresion regular
-        String coincidencias = "(Linea|Circulo|Triangulo|Cuadrado|Rectangulo)\\b|"
+        String regexCaracteres = "(Linea|Circulo|Triangulo|Cuadrado|Rectangulo)\\b|"
         + "([-])|"
         + "(\\()|"
         + "(\\))|"
         + "(\\,)|"
         + "([0-9]+)|"
         + "(\\s+)|"
-        + "(^(\s)*)";
+        + "(^(\\s)*)";
+
+        String regexFigura = "(((\\(\\d{1,2},\\d{1,2}\\)){2,4})+-+\\([1-3]\\)+-+\\((25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2}),(25[0-5]|2[0-4]\\d|1\\d{1,2}|\\d{1,2})\\))|"
+                + "(((\s)*))";
+
+        String regexCoordenada = "\\(((\\d,[0-9]),(\\d,[0-9])){2,4}\\)";
+
+        String regexGrosor = "\\(([1-3])\\)";
+
+        String regexColor = "\\((\\d{1,3},\\d{1,3},\\d{1,3})\\)";
+
 
         // Define un patron de busquedas dentro de nuestra cadena de coincidencias
-        Pattern pPatron = Pattern.compile(coincidencias);
+        Pattern pPatronCaracter = Pattern.compile(regexCaracteres);
+        Pattern pPatronFigura = Pattern.compile(regexFigura);
+        Pattern pPatronCoordenada = Pattern.compile(regexCoordenada);
+        Pattern pPatronColor = Pattern.compile(regexColor);
+        Pattern pPatronGrosor = Pattern.compile(regexGrosor);
         // ralizara la búsqueda de nuestra coincidencias
-        Matcher mMatcher = pPatron.matcher(sCodigoFuente);
+        Matcher mMatcherCaracter = pPatronCaracter.matcher(sCodigoFuente);
+        Matcher mMatcherFigura = pPatronFigura.matcher(sCodigoFuente);
+        Matcher mMatcherCoordenada = pPatronCoordenada.matcher(sCodigoFuente);
+        Matcher mMatcherGrosor = pPatronGrosor.matcher(sCodigoFuente);
+        Matcher mMatcherColor = pPatronColor.matcher(sCodigoFuente);
+
+
+        while (mMatcherCoordenada.find()) {
+            String tokenCoordenada = mMatcherCoordenada.group(1);
+        
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcherCoordenada.start());
+        
+            if (tokenCoordenada != null) {
+                nPosLectura += tokenCoordenada.length();
+                int nPosInicioLexema = nPosLectura - tokenCoordenada.length();
+        
+                AgregarTablaSimbolos("Coordenada:", tokenCoordenada, nLinea, nPosInicioLexema, nPosLectura);
+            }
+        }
+
+
+        while(mMatcherFigura.find()){
+
+            
+            String tokenFiguras = mMatcherFigura.group(1);
+            String tokenEspacios = mMatcherFigura.group(2);
+
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcherFigura.start());
+
+            if (tokenEspacios != null) {
+                if (tokenEspacios.length() > 0) {
+                    nPosLectura += tokenEspacios.length();
+                }
+            }
+
+            if (tokenFiguras != null) {
+                nPosLectura += tokenFiguras.length();
+                int nPosInicioLexema = nPosLectura - tokenFiguras.length();
+
+                AgregarTablaSimbolos("Figura Carac:", tokenFiguras, nLinea, nPosInicioLexema,
+                        nPosLectura);
+            }
+
+        }
+
+
+        //regexGrosor
+        while(mMatcherGrosor.find()){
+
+            String tokenGrosor = mMatcherGrosor.group(1);
+
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcherGrosor.start());
+
+
+            if (tokenGrosor != null) {
+                nPosLectura += tokenGrosor.length();
+                int nPosInicioLexema = nPosLectura - tokenGrosor.length();
+
+                AgregarTablaSimbolos("Grosor:", tokenGrosor, nLinea, nPosInicioLexema,
+                        nPosLectura);
+            }
+        }
+
+        while(mMatcherColor.find()){
+
+            String tokenColor = mMatcherColor.group(1);
+
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcherColor.start());
+
+
+            // Obtener los componentes de color
+        String[] colorComponents = tokenColor.split(",");
+        int red = Integer.parseInt(colorComponents[0]);
+        int green = Integer.parseInt(colorComponents[1]);
+        int blue = Integer.parseInt(colorComponents[2]);
+
+        // Validar los rangos de los componentes de color
+        if (red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255) {
+        // Los componentes de color están dentro del rango válido
+        // Realiza las acciones necesarias
+        int nPosInicioLexema = mMatcherColor.start();
+        int nPosLectura = mMatcherColor.end();
+
+        AgregarTablaSimbolos("Color:", tokenColor, nLinea, nPosInicioLexema, nPosLectura);
+    } else {
+                                this.nPosLectura += tokenColor.length();
+                                int nPosInicioLexema = this.nPosLectura - tokenColor.length();
+                                System.out.println();
+                                System.out.format("%10s %10s %10s %10s",
+                                        " \033[31mERROR léxico:  \033[0m" + tokenColor, " Linea " + nLinea,
+                                        " Inicia " + nPosInicioLexema, " Termina " + nPosLectura);
+                                System.out.println();
+    }
+        }
 
         // Buscamos las coincidencias con el ciclo While
-        while (mMatcher.find()) {
+        while (mMatcherCaracter.find()) {
 
-            String tokenPalabrasrReservadas = mMatcher.group(1);
-            String tokenOAritmeticas = mMatcher.group(2);
-            String tokenParentesisIzq = mMatcher.group(3);
-            String tokenParentesisDer = mMatcher.group(4);
-            String tokenComa = mMatcher.group(5);
-            String tokenDigito = mMatcher.group(6);
-            String tokenEspacios = mMatcher.group(7);
+            String tokenPalabrasrReservadas = mMatcherCaracter.group(1);
+            String tokenOAritmeticas = mMatcherCaracter.group(2);
+            String tokenParentesisIzq = mMatcherCaracter.group(3);
+            String tokenParentesisDer = mMatcherCaracter.group(4);
+            String tokenComa = mMatcherCaracter.group(5);
+            String tokenDigito = mMatcherCaracter.group(6);
+            String tokenEspacios = mMatcherCaracter.group(7);
 
             
 
             int nPosInicioLexema = 0;
-            nLinea = ObtenerLinea(sCodigoFuente, mMatcher.start());
+            nLinea = ObtenerLinea(sCodigoFuente, mMatcherCaracter.start());
 
 
             //Palabras Reservadas
@@ -73,64 +181,62 @@ public class Analisis {
 
             //OAritmeticas
             if(tokenOAritmeticas != null){
-                tipoGRM = "Guion";
                 nPosLectura += tokenOAritmeticas.length();
                 nPosInicioLexema = nPosLectura - tokenOAritmeticas.length();
-                AgregarTablaToken("Operador/separador", tokenOAritmeticas, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                AgregarTablaToken("Operador/separador", tokenOAritmeticas, nLinea, nPosInicioLexema,
+                nPosLectura);
                 if(!simbolosAgregados.contains(tokenOAritmeticas)){
-                AgregarTablaSimbolos("Operador/separador: ", tokenOAritmeticas, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                AgregarTablaSimbolos("Operador/separador: ", tokenOAritmeticas, nLinea, nPosInicioLexema,
+                nPosLectura);
                 simbolosAgregados.add(tokenOAritmeticas);
                 }
             }
 
             //ParentesisIzquierdo
             if (tokenParentesisIzq != null) {
-                tipoGRM = "Parentesis abierto";
                 nPosLectura += tokenParentesisIzq.length();
                 nPosInicioLexema = nPosLectura - tokenParentesisIzq.length();
                 AgregarTablaToken("Delimitador:", tokenParentesisIzq, nLinea, nPosInicioLexema, nPosLectura);
                 if(!simbolosAgregados.contains(tokenParentesisIzq)){
-                AgregarTablaSimbolos("Delimitador: ", tokenParentesisIzq, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                AgregarTablaSimbolos("Delimitador: ", tokenParentesisIzq, nLinea, nPosInicioLexema,
+                nPosLectura);
                 simbolosAgregados.add(tokenParentesisIzq);
             }
             }
             
             //ParentesisDerecho
             if(tokenParentesisDer != null){
-                tipoGRM = "Parentesis cerrado";
                 nPosLectura += tokenParentesisDer.length();
                 nPosInicioLexema = nPosLectura - tokenParentesisDer.length();
                 AgregarTablaToken("Delimitador:", tokenParentesisDer, nLinea, nPosInicioLexema, nPosLectura);
                 if(!simbolosAgregados.contains(tokenParentesisDer)){
-                AgregarTablaSimbolos("DER Delimitador: ", tokenParentesisDer, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                AgregarTablaSimbolos("DER Delimitador: ", tokenParentesisDer, nLinea, nPosInicioLexema, nPosLectura);
                 simbolosAgregados.add(tokenParentesisDer);
                 }
             }
 
             //Coma
             if(tokenComa != null){
-                tipoGRM = "Coma";
                 nPosLectura += tokenComa.length();
                 nPosInicioLexema = nPosLectura - tokenComa.length();
                 AgregarTablaToken("Delimitador:", tokenComa, nLinea, nPosInicioLexema, nPosLectura);
                 if(!simbolosAgregados.contains(tokenComa)){
-                AgregarTablaSimbolos("Delimitador: ", tokenComa, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
+                AgregarTablaSimbolos("Delimitador: ", tokenComa, nLinea, nPosInicioLexema, nPosLectura);
                 simbolosAgregados.add(tokenComa);
             }
             }
+            
 
-            //Digito
-            if(tokenDigito != null){
-                tipoGRM = "Numero";
-                nPosLectura += tokenDigito.length();
-                nPosInicioLexema = nPosLectura - tokenDigito.length();
-                AgregarTablaToken("Digito:", tokenDigito, nLinea, nPosInicioLexema, nPosLectura);
-                if(!simbolosAgregados.contains(tokenDigito)){
-                AgregarTablaSimbolos("Digito: ", tokenDigito, nPosInicioLexema, nPosInicioLexema, nPosInicioLexema);
-                simbolosAgregados.add(tokenDigito);
-                }
-            }
-
+        //Digito
+     if (tokenDigito != null) {
+        nPosLectura += tokenDigito.length();
+        nPosInicioLexema = nPosLectura - tokenDigito.length();
+        AgregarTablaToken("Digito:", tokenDigito, nLinea, nPosInicioLexema, nPosLectura);
+        if (!simbolosAgregados.contains(tokenDigito)) {
+            AgregarTablaSimbolos("Digito: ", tokenDigito, nLinea, nPosInicioLexema, nPosLectura);
+            simbolosAgregados.add(tokenDigito);
+    }
+}
            //Espacios
             if (tokenEspacios != null) {
                 nPosLectura += tokenEspacios.length();
@@ -146,7 +252,7 @@ public class Analisis {
                 tokenEspacios == null 
                 ) {
 
-                String tokenDesconocido = sCodigoFuente.substring(nPosLectura, mMatcher.end());
+                String tokenDesconocido = sCodigoFuente.substring(nPosLectura, mMatcherCaracter.end());
                 nPosLectura += tokenDesconocido.length();
                 nPosInicioLexema = nPosLectura - tokenDesconocido.length();
                 AgregarTablaErrores("Símbolo no reconocido:", tokenDesconocido, nLinea, nPosInicioLexema, nPosLectura);
@@ -208,8 +314,11 @@ public class Analisis {
                             } else {
                                 this.nPosLectura += sPalabra.length();
                                 int nPosInicioLexema = this.nPosLectura - sPalabra.length();
-                                AgregarTablaErrores("Error:", sPalabra, nLinea, nPosInicioLexema,
-                                        nPosLectura);
+                                System.out.println();
+                                System.out.format("%10s %10s %10s %10s",
+                                        " \033[31mERROR léxico:  \033[0m" + sPalabra, " Linea " + nLinea,
+                                        " Inicia " + nPosInicioLexema, " Termina " + nPosLectura);
+                                System.out.println();
                                 sPalabra = "";
                             }
                         }

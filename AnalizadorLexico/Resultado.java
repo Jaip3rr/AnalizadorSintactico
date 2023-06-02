@@ -4,7 +4,7 @@ public class Resultado {
 
         }
 
-        public void ImprimirTblaTokens(TblaTokens[] aSimbolo, String tipo) {
+        public void ImprimirTblaTokens(TblaTokens[] aSimbolo) {
                 System.out.println();
                 System.out.println(
                                 "---------------------------------------------------------------------------------------------------------------------------------");
